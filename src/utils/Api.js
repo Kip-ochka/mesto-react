@@ -4,7 +4,7 @@ class Api {
     this._headers = options.headers
   }
 
-  response(res) {
+  checkResponse(res) {
     if (res.ok) {
       return res.json()
     } else {
@@ -14,13 +14,13 @@ class Api {
 
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, { headers: this._headers }).then(
-      this.response
+      this.checkResponse
     )
   }
 
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, { headers: this._headers }).then(
-      this.response
+      this.checkResponse
     )
   }
 
@@ -32,7 +32,7 @@ class Api {
         name: userInfo.name,
         about: userInfo.about,
       }),
-    }).then(this.response)
+    }).then(this.checkResponse)
   }
 
   addCard(data) {
@@ -40,28 +40,28 @@ class Api {
       method: 'POST',
       headers: this._headers,
       body: JSON.stringify(data),
-    }).then(this.response)
+    }).then(this.checkResponse)
   }
 
   removeCard(id) {
     return fetch(`${this._baseUrl}/cards/${id}`, {
       method: 'DELETE',
       headers: this._headers,
-    }).then(this.response)
+    }).then(this.checkResponse)
   }
 
   addLike(id) {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: 'PUT',
       headers: this._headers,
-    }).then(this.response)
+    }).then(this.checkResponse)
   }
 
   removeLike(id) {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: 'DELETE',
       headers: this._headers,
-    }).then(this.response)
+    }).then(this.checkResponse)
   }
 
   updateAvatar(data) {
@@ -71,7 +71,7 @@ class Api {
       body: JSON.stringify({
         avatar: data.avatar,
       }),
-    }).then(this.response)
+    }).then(this.checkResponse)
   }
 }
 

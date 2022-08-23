@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import loadAvatar from '../images/icons/loading.svg'
-import api from './Api'
+import api from '../utils/Api'
 import Card from './Card'
 
 function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
@@ -32,7 +32,7 @@ function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
             />
             <div
               className='profile__avatar-overlay'
-              onClick={onEditProfile}
+              onClick={onEditAvatar}
             ></div>
           </div>
           <div className='profile__info'>
@@ -41,7 +41,7 @@ function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
               <button
                 type='button'
                 className='profile__edit-button'
-                onClick={onEditAvatar}
+                onClick={onEditProfile}
               ></button>
             </div>
             <p className='profile__job'>{userDescription}</p>

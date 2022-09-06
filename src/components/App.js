@@ -7,6 +7,7 @@ import PopupWithForm from './PopupWithForm'
 import CurrentUserContext from "../contexts/CurrentUserContext";
 import api from "../utils/Api";
 import EditProfilePopup from "./EditProfilePopup";
+import EditAvatarPopup from "./EditAvatarPopup";
 
 function App() {
     const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false)
@@ -39,6 +40,12 @@ function App() {
         setIsImagePopupOpen(true)
     }
 
+    function handleUpdateUser(userInfo) {
+        api.setUserInfo(userInfo).then(newUserData=>{
+            setCurrentUser(newUserData)
+            closeAllPopup()
+        }).catch(e=>console.log(e))
+    }
     function closeAllPopup() {
         setIsEditAvatarPopupOpen(false)
         setIsEditProfilePopupOpen(false)
@@ -59,41 +66,7 @@ function App() {
                         onCardClick={handleCardClick}
                     />
                     <Footer/>
-                    <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopup} />
-                    {/*<PopupWithForm*/}
-                    {/*    name='edit-profile'*/}
-                    {/*    title='Редактировать профиль'*/}
-                    {/*    buttonText='Сохранить'*/}
-                    {/*    isOpen={isEditProfilePopupOpen}*/}
-                    {/*    onClose={closeAllPopup}*/}
-                    {/*>*/}
-                    {/*    <label className='form__formfield form__formfield_type_name'>*/}
-                    {/*        <input*/}
-                    {/*            type='text'*/}
-                    {/*            className='form__input form__input_type_name'*/}
-                    {/*            placeholder='Имя'*/}
-                    {/*            id='profilename'*/}
-                    {/*            name='name'*/}
-                    {/*            minLength='2'*/}
-                    {/*            maxLength='40'*/}
-                    {/*            required*/}
-                    {/*        />*/}
-                    {/*        <span className='form__input-error form__input-error_type_name'></span>*/}
-                    {/*    </label>*/}
-                    {/*    <label className='form__formfield form__formfield_type_job '>*/}
-                    {/*        <input*/}
-                    {/*            type='text'*/}
-                    {/*            className='form__input form__input_type_job'*/}
-                    {/*            placeholder='О себе'*/}
-                    {/*            id='about'*/}
-                    {/*            name='about'*/}
-                    {/*            minLength='2'*/}
-                    {/*            maxLength='200'*/}
-                    {/*            required*/}
-                    {/*        />*/}
-                    {/*        <span className='form__input-error form__input-error_type_about'></span>*/}
-                    {/*    </label>*/}
-                    {/*</PopupWithForm>*/}
+                    <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopup} onUpdateUser={handleUpdateUser}/>
                     <PopupWithForm
                         name='add-card'
                         title='Новое место'
@@ -126,25 +99,7 @@ function App() {
                             <span className='form__input-error form__input-error_type_link'></span>
                         </label>
                     </PopupWithForm>
-                    <PopupWithForm
-                        name='change-avatar'
-                        title='Обновить аватар'
-                        buttonText='Сохранить'
-                        isOpen={isEditAvatarPopupOpen}
-                        onClose={closeAllPopup}
-                    >
-                        <label className='form__formfield form__formfield_type_link'>
-                            <input
-                                type='url'
-                                className='form__input form__input_type_link'
-                                placeholder='Ссылка на картинку'
-                                id='avatar'
-                                name='avatar'
-                                required
-                            />
-                            <span className='form__input-error form__input-error_type_link'></span>
-                        </label>
-                    </PopupWithForm>
+                    <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopup} />
                     <PopupWithForm
                         name='confirm'
                         title='Вы уверены?'

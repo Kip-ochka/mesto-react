@@ -8,6 +8,7 @@ import CurrentUserContext from "../contexts/CurrentUserContext";
 import api from "../utils/Api";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
+import AddPlacePopup from "./AddPlacePopup";
 
 function App() {
     const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false)
@@ -15,8 +16,8 @@ function App() {
     const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false)
     const [isImagePopupOpen, setIsImagePopupOpen] = useState(false)
     const [selectedCard, setSelectedCard] = useState({})
-    const [currentUser, setCurrentUser] = useState(false)
-
+    const [currentUser, setCurrentUser] = useState({})
+    const [cards, setCards] = useState([])
     useEffect(() => {
         api.getUserInfo().then(userData => {
             setCurrentUser(userData)
@@ -41,17 +42,52 @@ function App() {
     }
 
     function handleUpdateUser(userInfo) {
-        api.setUserInfo(userInfo).then(newUserData=>{
+        api.setUserInfo(userInfo.values).then(newUserData => {
             setCurrentUser(newUserData)
             closeAllPopup()
-        }).catch(e=>console.log(e))
+        }).catch(e => console.log(e))
     }
+
+    function handleUpdateAvatar(avatar) {
+        api.updateAvatar(avatar).then(newUserAvatar => {
+            setCurrentUser(newUserAvatar)
+            closeAllPopup()
+        }).catch(e => console.log(e))
+    }
+
+    function handleAddCard(cardData) {
+        api.addCard(cardData).then(newCards => {
+            setCards(newCards)
+            closeAllPopup()
+        }).catch(e => console.log(e))
+    }
+
     function closeAllPopup() {
         setIsEditAvatarPopupOpen(false)
         setIsEditProfilePopupOpen(false)
         setIsAddPlacePopupOpen(false)
         setIsImagePopupOpen(false)
         setSelectedCard({})
+    }
+
+    useEffect(() => {
+        api.getInitialCards()
+            .then(initialCards => {
+                setCards(initialCards)
+            })
+            .catch((err) => console.log(err))
+    }, [])
+
+    function handleCardLike(card) {
+        const isLiked = card.likes.some(item => item._id === currentUser._id);
+        api.changeLikeCardStatus(card._id, isLiked).then((newCard) => {
+            setCards((state) => state.map((c) => c._id === card._id ? newCard : c)
+            );
+        });
+    }
+
+    function handleCardDelete(card) {
+        api.removeCard(card._id).then(setCards(cards.filter(item => item._id !== card._id)))
     }
 
     return (
@@ -64,42 +100,16 @@ function App() {
                         onAddPlace={handleAddPlaceClick}
                         onEditAvatar={handleEditAvatarClick}
                         onCardClick={handleCardClick}
+                        cards={cards}
+                        handleCardLike={handleCardLike}
+                        handleCardDelete={handleCardDelete}
                     />
                     <Footer/>
-                    <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopup} onUpdateUser={handleUpdateUser}/>
-                    <PopupWithForm
-                        name='add-card'
-                        title='Новое место'
-                        buttonText='Создать'
-                        isOpen={isAddPlacePopupOpen}
-                        onClose={closeAllPopup}
-                    >
-                        <label className='form__formfield form__formfield_type_place-name'>
-                            <input
-                                type='text'
-                                className='form__input form__input_type_place-name'
-                                placeholder='Название'
-                                id='name'
-                                name='name'
-                                required
-                                minLength='2'
-                                maxLength='40'
-                            />
-                            <span className='form__input-error form__input-error_type_name'></span>
-                        </label>
-                        <label className='form__formfield form__formfield_type_link'>
-                            <input
-                                type='url'
-                                className='form__input form__input_type_link'
-                                placeholder='Ссылка на картинку'
-                                id='link'
-                                name='link'
-                                required
-                            />
-                            <span className='form__input-error form__input-error_type_link'></span>
-                        </label>
-                    </PopupWithForm>
-                    <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopup} />
+                    <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopup}
+                                      onUpdateUser={handleUpdateUser}/>
+                    <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopup} onAddCard={handleAddCard}/>
+                    <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopup}
+                                     onUpdateAvatar={handleUpdateAvatar}/>
                     <PopupWithForm
                         name='confirm'
                         title='Вы уверены?'

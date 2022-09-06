@@ -1,33 +1,22 @@
-import {useContext, useEffect, useState} from 'react';
+import {useContext, useEffect} from 'react';
 import PopupWithForm from "./PopupWithForm";
 import CurrentUserContext from "../contexts/CurrentUserContext";
 import {useForm} from "../hooks/useForm";
 
 const EditProfilePopup = ({isOpen, onClose, onUpdateUser}) => {
     const user = useContext(CurrentUserContext)
-    // const [name, setName] = useState(' ')
-    // const [description, setDescription] = useState(' ')
-    const {values, handleChange, setValues}  = useForm('')
+    const {values, handleChange, setValues} = useForm(user)
 
     useEffect(() => {
-        setValues(user.name);
-        setValues(user.about);
+        setValues(user)
     }, [user])
 
-    // function handleChangeName(e) {
-    //     setsetName(e.target.value)
-    // }
-    //
-    // function handleChangeDescription(e) {
-    //     setsetDescription(e.target.value)
-    // }
-
-     function handleSubmit (e) {
-         e.preventDefault()
-         onUpdateUser({
-             values,
-         })
-     }
+    function handleSubmit(e) {
+        e.preventDefault()
+        onUpdateUser({
+            values
+        })
+    }
 
     return (
         <PopupWithForm
@@ -36,7 +25,7 @@ const EditProfilePopup = ({isOpen, onClose, onUpdateUser}) => {
             buttonText='Сохранить'
             isOpen={isOpen}
             onClose={onClose}
-            // onSubmit={handleSubmit}
+            onSubmit={handleSubmit}
         >
             <label className='form__formfield form__formfield_type_name'>
                 <input
@@ -48,7 +37,7 @@ const EditProfilePopup = ({isOpen, onClose, onUpdateUser}) => {
                     minLength='2'
                     maxLength='40'
                     required
-                    value={values}
+                    value={values.name || ''}
                     onChange={handleChange}
                 />
                 <span className='form__input-error form__input-error_type_name'></span>
@@ -63,7 +52,7 @@ const EditProfilePopup = ({isOpen, onClose, onUpdateUser}) => {
                     minLength='2'
                     maxLength='200'
                     required
-                    value={values}
+                    value={values.about || ''}
                     onChange={handleChange}
                 />
                 <span className='form__input-error form__input-error_type_about'></span>

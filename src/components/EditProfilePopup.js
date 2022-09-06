@@ -13,9 +13,7 @@ const EditProfilePopup = ({isOpen, onClose, onUpdateUser}) => {
 
     function handleSubmit(e) {
         e.preventDefault()
-        onUpdateUser({
-            values
-        })
+        onUpdateUser({values})
     }
 
     return (

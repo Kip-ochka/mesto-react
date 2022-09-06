@@ -56,8 +56,8 @@ function App() {
     }
 
     function handleAddCard(cardData) {
-        api.addCard(cardData).then(newCards => {
-            setCards(newCards)
+        api.addCard(cardData.values).then(newCard => {
+            setCards([newCard, ...cards])
             closeAllPopup()
         }).catch(e => console.log(e))
     }

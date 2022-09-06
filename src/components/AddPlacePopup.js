@@ -3,15 +3,23 @@ import {useForm} from "../hooks/useForm";
 import {useEffect} from "react";
 
 
-const AddPlacePopup = ({isOpen, onClose,onSubmit}) => {
-    const cardData ={
-        name:'',
-        link:''
+const AddPlacePopup = ({isOpen, onClose, onAddCard}) => {
+    const cardData = {
+        name: '',
+        link: ''
     }
+
     const {values, handleChange, setValues} = useForm(cardData)
     useEffect(() => {
         setValues(cardData);
     }, [])
+
+    function handleSubmit(e) {
+        e.preventDefault()
+        onAddCard({values})
+        setValues({name:'', link:''})
+    }
+
     return (
         <PopupWithForm
             name='add-card'
@@ -19,7 +27,7 @@ const AddPlacePopup = ({isOpen, onClose,onSubmit}) => {
             buttonText='Создать'
             isOpen={isOpen}
             onClose={onClose}
-            onSubmit={onSubmit}
+            onSubmit={handleSubmit}
         >
             <label className='form__formfield form__formfield_type_place-name'>
                 <input

@@ -18,6 +18,18 @@ function App() {
     const [selectedCard, setSelectedCard] = useState({})
     const [currentUser, setCurrentUser] = useState({})
     const [cards, setCards] = useState([])
+    const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || selectedCard
+
+    useEffect(() => {
+        function closeByEscape(evt) {if(evt.key === 'Escape') {closeAllPopup();}}
+        if(isOpen) {
+            document.addEventListener('keydown', closeByEscape);
+            return () => {
+                document.removeEventListener('keydown', closeByEscape);
+            }
+        }
+    }, [isOpen])
+
     useEffect(() => {
         api.getUserInfo().then(userData => {
             setCurrentUser(userData)
@@ -81,17 +93,17 @@ function App() {
     function handleCardLike(card) {
         const isLiked = card.likes.some(item => item._id === currentUser._id);
         api.changeLikeCardStatus(card._id, isLiked).then((newCard) => {
-            setCards((state) => state.map((c) => c._id === card._id ? newCard : c)
-            );
-        });
+            setCards((state) => state.map((c) => c._id === card._id ? newCard : c))
+        }).catch((err) => console.log(err))
     }
 
     function handleCardDelete(card) {
-        api.removeCard(card._id).then(setCards(cards.filter(item => item._id !== card._id)))
+        api.removeCard(card._id)
+            .then(setCards(cards.filter(item => item._id !== card._id)))
+            .catch((err) => console.log(err))
     }
 
-    return (
-        <CurrentUserContext.Provider value={currentUser}>
+    return (<CurrentUserContext.Provider value={currentUser}>
             <div className='App'>
                 <div className='page'>
                     <Header/>

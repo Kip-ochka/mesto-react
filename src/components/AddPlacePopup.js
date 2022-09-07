@@ -2,8 +2,7 @@ import PopupWithForm from "./PopupWithForm";
 import {useEffect} from "react";
 import {useFormAndValidation} from "../hooks/useFormAndValidation";
 
-
-const AddPlacePopup = ({isOpen, onClose, onAddCard}) => {
+const AddPlacePopup = ({isOpen, onClose, onAddCard, isLoading}) => {
     const cardData = {
         name: '',
         link: ''
@@ -16,7 +15,7 @@ const AddPlacePopup = ({isOpen, onClose, onAddCard}) => {
             resetForm()
         }
     }, [isOpen])
-    
+
 
     function handleSubmit(e) {
         e.preventDefault()
@@ -27,10 +26,12 @@ const AddPlacePopup = ({isOpen, onClose, onAddCard}) => {
         <PopupWithForm
             name='add-card'
             title='Новое место'
-            buttonText='Создать'
+            defaultButtonText='Сохранить'
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={handleSubmit}
+            isValid={isValid}
+            isLoading={isLoading}
         >
             <label className='form__formfield form__formfield_type_place-name'>
                 <input

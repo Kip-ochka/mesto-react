@@ -15,14 +15,24 @@ function App() {
     const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false)
     const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false)
     const [isImagePopupOpen, setIsImagePopupOpen] = useState(false)
+
+    const [isLoadingUser, setIsLoadingUser] = useState(false)
+    const [isLoadingAddCard, setIsLoadingAddCard] = useState(false)
+    const [isLoadingAvatar, setIsLoadingAvatar] = useState(false)
+
     const [selectedCard, setSelectedCard] = useState({})
     const [currentUser, setCurrentUser] = useState({})
     const [cards, setCards] = useState([])
     const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || selectedCard
 
     useEffect(() => {
-        function closeByEscape(evt) {if(evt.key === 'Escape') {closeAllPopup();}}
-        if(isOpen) {
+        function closeByEscape(evt) {
+            if (evt.key === 'Escape') {
+                closeAllPopup();
+            }
+        }
+
+        if (isOpen) {
             document.addEventListener('keydown', closeByEscape);
             return () => {
                 document.removeEventListener('keydown', closeByEscape);
@@ -54,24 +64,38 @@ function App() {
     }
 
     function handleUpdateUser(userInfo) {
+        setIsLoadingUser(true)
         api.setUserInfo(userInfo.values).then(newUserData => {
             setCurrentUser(newUserData)
             closeAllPopup()
-        }).catch(e => console.log(e))
+        }).finally(() => setIsLoadingUser(false)).catch(e => console.log(e))
     }
 
-    function handleUpdateAvatar(avatar) {
-        api.updateAvatar(avatar).then(newUserAvatar => {
+    function handleUpdateAvatar(avatarData) {
+        setIsLoadingAvatar(true)
+        api.updateAvatar(avatarData.avatar).then(newUserAvatar => {
             setCurrentUser(newUserAvatar)
             closeAllPopup()
+        }).finally(() => {
+            setIsLoadingAvatar(false)
         }).catch(e => console.log(e))
     }
 
     function handleAddCard(cardData) {
+        setIsLoadingAddCard(true)
         api.addCard(cardData.values).then(newCard => {
             setCards([newCard, ...cards])
             closeAllPopup()
+        }).finally(() => {
+            setIsLoadingAddCard(false)
         }).catch(e => console.log(e))
+    }
+
+    function handleClosePopup(e) {
+        if (e.target.classList.contains('popup') || e.target.classList.contains('popup__close-button')) {
+            //реализация закрытия по клику на оверлей либо по клику на крестик
+            closeAllPopup();
+        }
     }
 
     function closeAllPopup() {
@@ -117,11 +141,12 @@ function App() {
                         handleCardDelete={handleCardDelete}
                     />
                     <Footer/>
-                    <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopup}
-                                      onUpdateUser={handleUpdateUser}/>
-                    <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopup} onAddCard={handleAddCard}/>
-                    <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopup}
-                                     onUpdateAvatar={handleUpdateAvatar}/>
+                    <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={handleClosePopup}
+                                      onUpdateUser={handleUpdateUser} isLoading={isLoadingUser}/>
+                    <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={handleClosePopup} onAddCard={handleAddCard}
+                                   isLoading={isLoadingAddCard}/>
+                    <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={handleClosePopup}
+                                     onUpdateAvatar={handleUpdateAvatar} isLoading={isLoadingAvatar}/>
                     <PopupWithForm
                         name='confirm'
                         title='Вы уверены?'

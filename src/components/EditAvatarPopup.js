@@ -1,30 +1,35 @@
 import PopupWithForm from "./PopupWithForm";
-import {useRef, useState} from "react";
+import {useEffect} from "react";
+import {useFormAndValidation} from "../hooks/useFormAndValidation";
 
-const EditAvatarPopup = ({isOpen, onClose, onUpdateAvatar}) => {
-    const [inputValue, setInputValue] = useState('')
-    const avatarInput = useRef()
+const EditAvatarPopup = ({isOpen, onClose, onUpdateAvatar, isLoading}) => {
+    const avatarData = {avatar: ''}
+    const {values, handleChange, errors, isValid, setValues, resetForm} = useFormAndValidation(avatarData)
 
-    function handleChange(e) {
-        setInputValue(e.target.value)
-    }
+    useEffect(() => {
+        setValues(avatarData)
+        if (!isOpen) {
+            resetForm()
+        }
+    }, [isOpen])
 
     function handleSubmit(e) {
         e.preventDefault();
         onUpdateAvatar({
-            avatar: inputValue,
+            avatar: values,
         })
-        avatarInput.current.value = ''
     }
 
     return (
         <PopupWithForm
             name='change-avatar'
             title='Обновить аватар'
-            buttonText='Сохранить'
+            defaultButtonText='Сохранить'
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={handleSubmit}
+            isValid={isValid}
+            isLoading={isLoading}
         >
             <label className='form__formfield form__formfield_type_link'>
                 <input
@@ -34,10 +39,11 @@ const EditAvatarPopup = ({isOpen, onClose, onUpdateAvatar}) => {
                     id='avatar'
                     name='avatar'
                     required
-                    ref={avatarInput}
+                    value={values.avatar || ''}
                     onChange={handleChange}
                 />
-                <span className='form__input-error form__input-error_type_link'></span>
+                <span
+                    className={`form__input-error form__input-error_type_link ${isValid ? '' : 'form__input-error_active'}`}>{errors.avatar}</span>
             </label>
         </PopupWithForm>
     )

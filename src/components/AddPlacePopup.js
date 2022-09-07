@@ -1,6 +1,6 @@
 import PopupWithForm from "./PopupWithForm";
-import {useForm} from "../hooks/useForm";
 import {useEffect} from "react";
+import {useFormAndValidation} from "../hooks/useFormAndValidation";
 
 
 const AddPlacePopup = ({isOpen, onClose, onAddCard}) => {
@@ -9,15 +9,18 @@ const AddPlacePopup = ({isOpen, onClose, onAddCard}) => {
         link: ''
     }
 
-    const {values, handleChange, setValues} = useForm(cardData)
+    const {values, handleChange, errors, isValid, setValues, resetForm} = useFormAndValidation(cardData)
     useEffect(() => {
-        setValues(cardData);
-    }, [])
+        setValues(cardData)
+        if (!isOpen) {
+            resetForm()
+        }
+    }, [isOpen])
+    
 
     function handleSubmit(e) {
         e.preventDefault()
         onAddCard({values})
-        setValues({name:'', link:''})
     }
 
     return (
@@ -39,10 +42,11 @@ const AddPlacePopup = ({isOpen, onClose, onAddCard}) => {
                     required
                     minLength='2'
                     maxLength='40'
-                    value={values.name}
+                    value={values.name || ''}
                     onChange={handleChange}
                 />
-                <span className='form__input-error form__input-error_type_name'></span>
+                <span
+                    className={`form__input-error form__input-error_type_name ${isValid ? '' : 'form__input-error_active'}`}>{errors.name}</span>
             </label>
             <label className='form__formfield form__formfield_type_link'>
                 <input
@@ -52,10 +56,11 @@ const AddPlacePopup = ({isOpen, onClose, onAddCard}) => {
                     id='link'
                     name='link'
                     required
-                    value={values.link}
+                    value={values.link || ''}
                     onChange={handleChange}
                 />
-                <span className='form__input-error form__input-error_type_link'></span>
+                <span
+                    className={`form__input-error form__input-error_type_link ${isValid ? '' : 'form__input-error_active'}`}>{errors.link}</span>
             </label>
         </PopupWithForm>
     );

@@ -1,14 +1,17 @@
 import {useContext, useEffect} from 'react';
 import PopupWithForm from "./PopupWithForm";
 import CurrentUserContext from "../contexts/CurrentUserContext";
-import {useForm} from "../hooks/useForm";
+import {useFormAndValidation} from "../hooks/useFormAndValidation";
 
 const EditProfilePopup = ({isOpen, onClose, onUpdateUser}) => {
     const user = useContext(CurrentUserContext)
-    const {values, handleChange, setValues} = useForm(user)
+    const {values, handleChange, errors, isValid, setValues, resetForm} = useFormAndValidation(user)
 
     useEffect(() => {
         setValues(user)
+        if (!isOpen) {
+            resetForm()
+        }
     }, [user, isOpen])
 
     function handleSubmit(e) {
@@ -38,7 +41,8 @@ const EditProfilePopup = ({isOpen, onClose, onUpdateUser}) => {
                     value={values.name || ''}
                     onChange={handleChange}
                 />
-                <span className='form__input-error form__input-error_type_name'></span>
+                <span
+                    className={`form__input-error form__input-error_type_name ${isValid ? '' : 'form__input-error_active'}`}>{errors.name}</span>
             </label>
             <label className='form__formfield form__formfield_type_job '>
                 <input
@@ -53,7 +57,8 @@ const EditProfilePopup = ({isOpen, onClose, onUpdateUser}) => {
                     value={values.about || ''}
                     onChange={handleChange}
                 />
-                <span className='form__input-error form__input-error_type_about'></span>
+                <span
+                    className={`form__input-error form__input-error_type_about ${isValid ? '' : 'form__input-error_active'}`}>{errors.about}</span>
             </label>
         </PopupWithForm>
     );
